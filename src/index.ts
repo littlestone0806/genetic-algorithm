@@ -551,34 +551,41 @@ function createChart() {
     ],
   };
 
+  // 配置全局字体（新版方式）
   Chart.defaults.font.size = 18;
-  Chart.defaults.color = "#fff";
-  Chart.defaults.scales.linear.min = 0;
+  Chart.defaults.color = "#fff"; // 这个会同时影响标题、标签等
+  // 创建图表实例
   chart = new Chart(ctx, {
     type: "line",
     data: data,
     options: {
       responsive: false,
-      legend: {
-        labels: {
-          fontColor: "white",
-        },
+      plugins: { // 所有插件配置都要放在这里
+        legend: {
+          labels: {
+            color: "#fff" // ✅ 正确属性名，同时这里也可以单独覆盖全局配置
+          }
+        }
       },
       scales: {
         x: {
+          type: "linear", // 明确指定轴类型
           title: {
             display: true,
-            text: "Generations",
+            text: "Generations"
           },
+          min: 0 // 建议直接在这里设置最小值，而不是通过全局
         },
         y: {
+          type: "linear",
           title: {
             display: true,
-            text: "Fitness",
+            text: "Fitness"
           },
-        },
-      },
-    },
+          min: 0
+        }
+      }
+    }
   });
 }
 
