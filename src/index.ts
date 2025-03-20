@@ -19,37 +19,39 @@ let GA: GeneticAlgorithm;
   });
 
   const paramFolder = pane.addFolder({
-    title: "Parameters",
+    title: "参数设置",
   });
   paramFolder.addInput(params, "populationSize", {
     step: 1,
     min: 1,
     max: 128,
+    label: "种群数量",
   });
   paramFolder.addInput(params, "creatureSegments", {
     step: 1,
     min: 1,
     max: 5,
+    label: "生物节段数",
   });
   paramFolder
     .addButton({
-      title: "Restart Evolution",
+      title: "重新启动进化",
     })
     .on("click", () => {
       GA.initialize(params.populationSize);
     });
   paramFolder
     .addButton({
-      label: "states",
-      title: "Save",
+      label: "状态",
+      title: "保存",
     })
     .on("click", () => {
       saveAsJson(GA.dump(), "ga-states.json");
     });
   paramFolder
     .addButton({
-      label: "states",
-      title: "Load Pretrained",
+      label: "状态",
+      title: "加载预训练模型",
     })
     .on("click", () => {
       fetchJson("ga-states.json", (generationData) => {
@@ -59,18 +61,18 @@ let GA: GeneticAlgorithm;
     });
 
   const playbackFolder = pane.addFolder({
-    title: "Playback",
+    title: "回放",
   });
 
-  playbackFolder.addInput(params, "replayMode").on("change", (ev: any) => {
+  playbackFolder.addInput(params, "replayMode", { label: "回放模式" }).on("change", (ev: any) => {
     GA.replayGeneration(ev.value ? params.replayGenIndex : -1);
   });
-  playbackFolder.addInput(params, "speedUp", { step: 1, min: 1, max: 100 });
-  playbackFolder.addInput(params, "replayGenIndex", { step: 1 });
+  playbackFolder.addInput(params, "speedUp", { step: 1, min: 1, max: 100, label: "加速倍数" });
+  playbackFolder.addInput(params, "replayGenIndex", { step: 1, label: "回放世代索引" });
   playbackFolder
     .addButton({
-      title: "Prev",
-      label: "replayGeneration",
+      title: "上一代",
+      label: "回放世代",
     })
     .on("click", () => {
       if (params.replayMode) {
@@ -81,8 +83,8 @@ let GA: GeneticAlgorithm;
     });
   playbackFolder
     .addButton({
-      title: "Next",
-      label: "replayGeneration",
+      title: "下一代",
+      label: "回放世代",
     })
     .on("click", () => {
       if (params.replayMode) {
@@ -93,17 +95,18 @@ let GA: GeneticAlgorithm;
     });
 
   const uiFolder = pane.addFolder({
-    title: "UI",
+    title: "UI界面",
   });
   uiFolder.addInput(params, "showIndividual", {
     step: 1,
     min: -1,
     max: params.populationSize - 1,
+    label: "显示个体(-1为全体)",
   });
   uiFolder
     .addButton({
-      label: "show",
-      title: "All",
+      label: "显示",
+      title: "所有",
     })
     .on("click", () => {
       params.showIndividual = -1;
@@ -111,21 +114,21 @@ let GA: GeneticAlgorithm;
     });
   uiFolder
     .addButton({
-      label: "show",
-      title: "Best",
+      label: "显示",
+      title: "最好",
     })
     .on("click", () => {
       params.showIndividual = GA.getBestIndex();
       pane.refresh();
     });
-  uiFolder.addInput(params, "cameraFollow");
-  uiFolder.addInput(params, "cameraMoveSpeed", { min: 0.01, max: 1 });
-  uiFolder.addInput(params, "showInfo");
-  uiFolder.addInput(params, "showChart").on("change", (ev: any) => {
+  uiFolder.addInput(params, "cameraFollow", { label: "镜头跟随" });
+  uiFolder.addInput(params, "cameraMoveSpeed", { min: 0.01, max: 1, label: "镜头移动速度" });
+  uiFolder.addInput(params, "showInfo", { label: "显示信息面板" });
+  uiFolder.addInput(params, "showChart", { label: "显示进化图表" }).on("change", (ev: any) => {
     const chartCanvas = document.getElementById("chartCanvas");
     chartCanvas.style.display = ev.value ? "block" : "none";
   });
-  uiFolder.addInput(params, "showScoreboard");
+  uiFolder.addInput(params, "showScoreboard", { label: "显示计分板" });
 }
 
 const engine = Matter.Engine.create();
@@ -537,13 +540,13 @@ function createChart() {
     labels: [] as string[],
     datasets: [
       {
-        label: "Best Fitness",
+        label: "最佳适应度",
         data: [] as number[],
         backgroundColor: chartColors.red,
         borderColor: chartColors.red,
       },
       {
-        label: "Avg Fitness",
+        label: "平均适应度",
         data: [] as number[],
         backgroundColor: chartColors.blue,
         borderColor: chartColors.blue,
@@ -572,7 +575,7 @@ function createChart() {
           type: "linear", // 明确指定轴类型
           title: {
             display: true,
-            text: "Generations"
+            text: "代"
           },
           min: 0 // 建议直接在这里设置最小值，而不是通过全局
         },
@@ -580,7 +583,7 @@ function createChart() {
           type: "linear",
           title: {
             display: true,
-            text: "Fitness"
+            text: "适应度"
           },
           min: 0
         }
